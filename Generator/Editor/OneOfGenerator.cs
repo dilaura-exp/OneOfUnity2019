@@ -1,3 +1,4 @@
+#if UNITY_2020_2_OR_NEWER
 using UnityEditor;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -192,13 +193,16 @@ namespace OneOf
         }}"
                 )}
 
-        public object Value =>
-            _index switch
-            {{
-                {RangeJoined(@"
-                ", j => $"{j} => _value{j},")}
-                _ => throw new InvalidOperationException()
-            }};
+        public object Value {{
+            get {{
+                switch(_index)
+                {{
+                    {RangeJoined(@"
+                    ", j => $"case {j}: return _value{j};")}
+                    default: throw new InvalidOperationException();
+                }}
+            }}
+        }}
 
         public int Index => _index;
 
@@ -250,15 +254,15 @@ namespace OneOf
             {{
                 throw new ArgumentNullException(nameof(mapFunc));
             }}
-            return _index switch
+            switch(_index)
             {{
                 {genericArgs.Joined(@"
                 ", (x, k) =>
                             x == bindToType ?
-                                $"{k} => mapFunc(As{x})," :
-                                $"{k} => As{x},")}
-                _ => throw new InvalidOperationException()
-            }};
+                                $"case {k}: return mapFunc(As{x});" :
+                                $"case {k}: return As{x};")}
+                default: throw new InvalidOperationException();
+            }}
         }}";
                 }))}
 ");
@@ -274,15 +278,15 @@ namespace OneOf
 		public bool TryPickT{j}(out T{j} value, out {remainderType} remainder)
 		{{
 			value = IsT{j} ? AsT{j} : default;
-            remainder = _index switch
+            switch(_index)
             {{
                 {RangeJoined(@"
                 ", k =>
                             k == j ?
-                                $"{k} => default," :
-                                $"{k} => AsT{k},")}
-                _ => throw new InvalidOperationException()
-            }};
+                                $"case {k}: remainder = default; break;" :
+                                $"case {k}: remainder = AsT{k}; break;")}
+                default: throw new InvalidOperationException();
+            }}
 			return this.IsT{j};
 		}}";
                     })
@@ -290,14 +294,14 @@ namespace OneOf
             }
 
             sb.AppendLine($@"
-        bool Equals({className}<{genericArg}> other) =>
-            _index == other._index &&
-            _index switch
+        bool Equals({className}<{genericArg}> other) {{
+            switch(_index)
             {{
                 {RangeJoined(@"
-                ", j => @$"{j} => Equals(_value{j}, other._value{j}),")}
-                _ => false
-            }};
+                ", j => @$"case {j}: return _index == other._index && Equals(_value{j}, other._value{j});")}
+                default: return false;
+            }}
+        }}
 
         public override bool Equals(object obj)
         {{
@@ -316,23 +320,25 @@ namespace OneOf
                     )}
         }}
 
-        public override string ToString() =>
-            _index switch {{
+        public override string ToString() {{
+            switch(_index) {{
                 {RangeJoined(@"
-                ", j => $"{j} => FormatValue(_value{j}),")}
-                _ => throw new InvalidOperationException(""Unexpected index, which indicates a problem in the OneOf codegen."")
-            }};
+                ", j => $"case {j}: return FormatValue(_value{j});")}
+                default: throw new InvalidOperationException(""Unexpected index, which indicates a problem in the OneOf codegen."");
+            }}
+        }}
 
         public override int GetHashCode()
         {{
             unchecked
             {{
-                int hashCode = _index switch
+                int hashCode;
+                switch(_index)
                 {{
                     {RangeJoined(@"
-                    ", j => $"{j} => _value{j}?.GetHashCode(),")}
-                    _ => 0
-                }} ?? 0;
+                    ", j => $"case {j}: hashCode = _value{j}?.GetHashCode() ?? 0; break;")}
+                    default: hashCode = 0; break;
+                }}
                 return (hashCode*397) ^ _index;
             }}
         }}
@@ -379,3 +385,4 @@ namespace OneOf
 #pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     }
 }
+#endif

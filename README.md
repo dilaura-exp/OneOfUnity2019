@@ -4,6 +4,12 @@
 
 This package is an adaptation of the amazing [OneOf](https://github.com/mcintyre321/OneOf/tree/master) library. If you find this package useful please check out the original and give it a star!
 
+## Fork Notes
+
+The original package only support C# 8.0, which is used in Unity 2020.2 or newer.
+In this version, a traditional switch case is used in order to be compatible with C# 7.3, which is used by Unity 2019 and Unity 2020.1.
+This may work with 2018 in C# 7.3. However, this has not yet been tested in Unity 2018.
+
 ## Getting started
 
 ### Installation
@@ -11,7 +17,7 @@ This package is an adaptation of the amazing [OneOf](https://github.com/mcintyre
 - Go to `Window/Package Manager`
 - Click on the plus [+] symbol in the top left corner of the window
 - Click "Add package from git URL..."
-- Paste in `https://github.com/Simply-Cods/OneOfUnity.git?path=/OneOfUnity#latest` (you can specify your desired version by replacing 'latest')
+- Paste in `https://github.com/dilaura-exp/OneOfUnity2019?path=/OneOfUnity#latest` (you can specify your desired version by replacing 'latest')
 
 If you encounter any issues throughout the installation process, please refer to the official documentation from Unity [here](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 

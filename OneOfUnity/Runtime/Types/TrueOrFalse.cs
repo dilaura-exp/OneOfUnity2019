@@ -9,9 +9,9 @@
         public static implicit operator TrueOrFalse(True _) => new TrueOrFalse(_);
         public static implicit operator TrueOrFalse(False _) => new TrueOrFalse(_);
 
-        public static implicit operator TrueOrFalse(bool value) => new TrueOrFalse(
-            value ? new True() :
-            new False()
-        );
+        public static implicit operator TrueOrFalse(bool value)
+        {
+            return value ? new TrueOrFalse(new True()) : new TrueOrFalse(new False());
+        }
     }
 }

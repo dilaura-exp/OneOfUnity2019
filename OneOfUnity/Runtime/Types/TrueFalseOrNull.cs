@@ -1,7 +1,5 @@
-namespace OneOf.Types
-{
-    public class TrueFalseOrNull : OneOfBase<TrueFalseOrNull.True, TrueFalseOrNull.False, TrueFalseOrNull.Null>
-    {
+namespace OneOf.Types {
+    public class TrueFalseOrNull : OneOfBase<TrueFalseOrNull.True, TrueFalseOrNull.False, TrueFalseOrNull.Null> {
         TrueFalseOrNull(OneOf<True, False, Null> _) : base(_) { }
         public class True { }
         public class False { }
@@ -11,9 +9,11 @@ namespace OneOf.Types
         public static implicit operator TrueFalseOrNull(False _) => new TrueFalseOrNull(_);
         public static implicit operator TrueFalseOrNull(Null _) => new TrueFalseOrNull(_);
 
-        public static implicit operator TrueFalseOrNull(bool? value) => new TrueFalseOrNull(
-            value is null ? new Null() :
-            value.Value ? new True() :
-            new False());
+        public static implicit operator TrueFalseOrNull(bool? value) {
+            if (!value.HasValue) {
+                return new TrueFalseOrNull(new Null());
+            }
+            return value.Value ? new TrueFalseOrNull(new True()) : new TrueFalseOrNull(new False());
+        }
     }
 }
